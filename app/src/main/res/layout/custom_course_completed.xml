@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="20dp"
+    android:layout_marginStart="5dp"
+    android:layout_marginBottom="5dp"
+    android:layout_marginEnd="5dp"
+    android:layout_marginTop="10dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <RelativeLayout
+        android:padding="5dp"
+        android:background="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardView_completed"
+            app:cardCornerRadius="20dp"
+            android:padding="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:scaleType="centerCrop"
+                android:id="@+id/img_course_completed"
+                android:src="@drawable/background_login"
+                android:layout_width="150dp"
+                android:layout_height="150dp"/>
+        </androidx.cardview.widget.CardView>
+
+        <LinearLayout
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/cardView_completed"
+            android:paddingStart="10dp"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:id="@+id/img_view"
+
+                    android:src="@drawable/teacher"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"/>
+                <TextView
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/img_view"
+                    android:id="@+id/tv_name_instructor_completed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="name of instructor" />
+                <ImageView
+                    android:layout_marginEnd="5dp"
+                    android:layout_alignParentEnd="true"
+                    android:src="@drawable/baseline_more_vert_24"
+                    android:layout_width="25dp"
+                    android:layout_height="30dp"/>
+            </RelativeLayout>
+
+
+            <TextView
+                android:id="@+id/tv_name_course_completed"
+                android:layout_marginEnd="20dp"
+                android:textColor="@color/black"
+                android:textSize="22sp"
+                android:text="introduction of course_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:layout_marginTop="10dp"
+                    android:text="@string/completed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>

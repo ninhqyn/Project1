@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="18dp"
+    android:layout_marginTop="20dp"
+    android:layout_marginBottom="20dp"
+    android:id="@+id/layout_category"
+    android:layout_marginStart="10dp"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+    <RelativeLayout
+        android:paddingTop="5dp"
+        android:background="@color/oneColor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:scaleType="centerInside"
+            android:id="@+id/img_category"
+            android:layout_width="80dp"
+            android:layout_height="60dp"
+            android:src="@drawable/online_course" />
+        <TextView
+            android:paddingStart="2dp"
+            android:paddingEnd="2dp"
+            android:paddingBottom="3dp"
+            android:textSize="11sp"
+            android:id="@+id/tv_name_category"
+            android:textColor="@color/black"
+            android:background="@color/white"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/img_category"
+            android:textAlignment="center"
+            android:text="Cơ sở dữ liệu sql mcsdaada"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"/>
+
+    </RelativeLayout>
+
+
+</androidx.cardview.widget.CardView>

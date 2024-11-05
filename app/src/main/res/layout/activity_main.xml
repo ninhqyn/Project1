@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Activity.MainActivity">
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/imageView"
+        tools:layout_editor_absoluteX="8dp">
+
+        <me.relex.circleindicator.CircleIndicator3
+            app:ci_width="50dp"
+            app:ci_margin="12dp"
+            android:id="@+id/indicator"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            app:ci_drawable="@drawable/circle_indicator_selected_on_board"
+            app:ci_drawable_unselected="@drawable/circle_indicator_unselected_on_board"
+            android:elevation="5dp" />
+
+        <TextView
+
+            android:textColor="#3F51B5"
+            android:layout_marginTop="25dp"
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            android:textAlignment="center"
+            android:text="Chào mừng đến với \nPROJECT 1" />
+        <TextView
+
+            android:textColor="#3F51B5"
+            android:layout_marginTop="25dp"
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textSize="20sp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:textAlignment="center"
+            android:text="PROJECT nơi cung cấp cho bạn các khóa học về lĩnh vực lập trình hàng đầu !!" />
+
+        <Button
+            android:background="@drawable/blue_background"
+            android:layout_margin="8dp"
+            android:id="@+id/btnBatDau"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Bắt đầu"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

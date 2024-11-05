@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Activity.PrivacyActivity">
+
+    <ImageButton
+        android:background="@drawable/transparent_background"
+        android:id="@+id/imageButton2"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:src="@drawable/baseline_arrow_back_24"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:textColor="@color/black"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageButton2"
+        android:text="Chúng tôi cam kết bảo vệ thông tin cá nhân của bạn. Bằng cách sử dụng ứng dụng này, bạn đồng ý với các điều khoản sau:\n\n
+    Thông tin thu thập: Chúng tôi có thể thu thập thông tin cá nhân như tên, địa chỉ email, và thông tin tài khoản để cung cấp dịch vụ và hỗ trợ bạn trong quá trình học tập.\n\n
+    Mục đích sử dụng: Thông tin của bạn sẽ được sử dụng để:\n
+    - Cung cấp và quản lý dịch vụ.\n
+    - Gửi thông báo về khóa học, bài kiểm tra và sự kiện.\n
+    - Cải thiện trải nghiệm người dùng và nội dung khóa học.\n\n
+    Chia sẻ thông tin: Chúng tôi sẽ không chia sẻ thông tin cá nhân của bạn với bên thứ ba mà không có sự đồng ý của bạn, trừ khi yêu cầu bởi pháp luật.\n\n
+    Bảo mật thông tin: Chúng tôi áp dụng các biện pháp bảo mật để bảo vệ thông tin của bạn khỏi truy cập trái phép và sử dụng không đúng.\n\n
+    Quyền của người dùng: Bạn có quyền yêu cầu truy cập, chỉnh sửa hoặc xóa thông tin cá nhân của mình.\n\n
+    Liên hệ: Nếu bạn có bất kỳ câu hỏi nào về chính sách quyền riêng tư, vui lòng liên hệ với chúng tôi qua địa chỉ email [địa chỉ email].\n\n
+    Tôi đồng ý với chính sách quyền riêng tư trên."
+    android:padding="16dp"
+    android:textSize="14sp"
+    android:lineSpacingExtra="2dp" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

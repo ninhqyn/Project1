@@ -1,0 +1,33 @@
+<resources>
+    <string name="app_name">CourseProject</string>
+    <string name="email">Email</string>
+    <string name="password">Mật khẩu</string>
+    <string name="login">Đăng nhập</string>
+    <string name="username">Tên đăng nhập</string>
+    <string name="confirm_password">Xác thực mật khẩu</string>
+    <string name="signup">Tạo tài khoản</string>
+    <string name="title_activity_trang_chu_actitvity">TrangChuActitvity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="content_course">Nội dung khóa học</string>
+    <string name="logout">Logout</string>
+    <string name="my_profile">My Profile</string>
+    <string name="edit">Edit</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="change_pass">Thay đổi mật khẩu</string>
+    <string name="mylearing">Khóa học của tôi</string>
+    <string name="completed">Completed</string>
+    <string name="unenroll">Hủy đăng ký</string>
+    <string name="share">Chia sẻ khóa học</string>
+    <string name="forgetpassword">Quên mật khẩu</string>
+    <string name="popularcourse">Khóa học phổ biến</string>
+    <string name="see_all">Xem tất cả</string>
+    <string name="my_learing">My learing</string>
+    <string name="account">Account</string>
+    <string name="channel_name">Chanel course\n</string>
+    <string name="channel_description">Thông báo về khóa học mới</string>
+    <string name="favorite">Favorite</string>
+</resources>
