@@ -1,11 +1,26 @@
 package com.example.courseproject.Model;
 
-public class Enrollment {
+import com.google.gson.annotations.SerializedName;
+
+import java.io.Serializable;
+
+public class Enrollment implements Serializable {
+    @SerializedName("enrollmentId")
     private int enrollmentId;
+
+    @SerializedName("userId")
     private int userId;
+
+    @SerializedName("courseId")
     private int courseId;
+
+    @SerializedName("enrolledAt")
     private String enrolledAt;
+
+    @SerializedName("status")
     private String status;
+
+    @SerializedName("hasCertificate")
     private boolean hasCertificate;
 
     public Enrollment(int userId, int courseId,  String status, boolean hasCertificate) {

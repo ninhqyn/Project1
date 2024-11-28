@@ -86,6 +86,7 @@ public class LessonFragment extends Fragment {
             public void onResponse(Call<Enrollment> call, Response<Enrollment> response) {
                 if(response.isSuccessful() && response.body()!=null){
                     enrollmentId = response.body().getEnrollmentId();
+                    isEnroll = true;
                 }
             }
 

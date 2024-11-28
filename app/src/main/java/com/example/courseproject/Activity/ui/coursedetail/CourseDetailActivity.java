@@ -22,13 +22,16 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
 import com.example.courseproject.Activity.LessonDetailActivity;
+import com.example.courseproject.Activity.LoginActivity;
 import com.example.courseproject.Activity.QuizActivity;
+import com.example.courseproject.Activity.TrangChuActitvity;
 import com.example.courseproject.Activity.ui.coursedetail.ui.LessonFragment;
 import com.example.courseproject.Activity.ui.coursedetail.ui.QuizFragment;
 import com.example.courseproject.Adapter.LessonAdapter;
@@ -48,6 +51,7 @@ import com.example.courseproject.Service.EnrollmentService;
 import com.example.courseproject.Service.InstructorService;
 import com.example.courseproject.Service.LessonService;
 import com.example.courseproject.SharedPerferences.DataLocalManager;
+import com.example.courseproject.ZaloPay.OrderActivity;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
@@ -72,6 +76,8 @@ public class CourseDetailActivity extends AppCompatActivity {
     private CourseDetailAdapter adapter;
     private ImageButton imgFavorite;
     private boolean isFavorite = false;
+    private Dialog loadingDialog;
+    private  final int REQUEST_CODE_PAYMENT = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,16 +104,25 @@ public class CourseDetailActivity extends AppCompatActivity {
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setResult(Activity.RESULT_OK);
-                finish();
+                if(!DataLocalManager.isPayment()){
+                    setResult(Activity.RESULT_OK);
+                    finish();
+                }
+                else {
+                    DataLocalManager.setPayment(false);
+                    Intent intent = new Intent(CourseDetailActivity.this, TrangChuActitvity.class);
+                    startActivity(intent);
+                }
+
             }
         });
         btnDangKy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (course != null) {
-                    if (isCertificate) {
-                        createDialogCertificate();
+                    if (isEnroll) {
+                        //createDialogCertificate();
+                        Toast.makeText(CourseDetailActivity.this,"Đã đăng ký",Toast.LENGTH_SHORT).show();
                     } else{
                         createDialogDangKy();
                     }
@@ -148,6 +163,29 @@ public class CourseDetailActivity extends AppCompatActivity {
 
             }
         });
+    }
+    private void createDialogLoading() {
+        loadingDialog = new Dialog(CourseDetailActivity.this);
+        loadingDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        loadingDialog.setContentView(R.layout.dialog_loading);
+        Window window = loadingDialog.getWindow();
+        if (window != null) {
+            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
+            WindowManager.LayoutParams lp = window.getAttributes();
+            lp.dimAmount = 0.5f;
+            window.setAttributes(lp);
+            window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+            window.setBackgroundDrawableResource(R.drawable.background_loading);
+        }
+        loadingDialog.setCancelable(false);
+        loadingDialog.show();
+    }
+
+    // Create a method to dismiss the loading dialog
+    private void dismissLoadingDialog() {
+        if (loadingDialog != null && loadingDialog.isShowing()) {
+            loadingDialog.dismiss();
+        }
     }
 
     private void callApiFavorite() {
@@ -334,11 +372,16 @@ public class CourseDetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(rdpur.isChecked()){
-                    Toast.makeText(CourseDetailActivity.this,"Purchasecourse enroll",Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(CourseDetailActivity.this, OrderActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable("course",course);
+                    intent.putExtras(bundle);
+                    startActivityForResult(intent, REQUEST_CODE_PAYMENT);
                     dialog.dismiss();
                 }
                 if(rdfull.isChecked()){
-                    callApiEnrollment();
+                    //createDialogLoading();
+                    //callApiEnrollment();
 
                     dialog.dismiss();
                 }
@@ -392,15 +435,10 @@ public class CourseDetailActivity extends AppCompatActivity {
                     isEnroll = true;
                     btnDangKy.setText("Đã đăng ký");
                     LessonFragment lessonFragment = (LessonFragment) adapter.getFragment(1);
-                    if (lessonFragment != null) {
-                        Log.d("isEnroll","true");
-                        lessonFragment.setEnrollStatus(isEnroll); // Gọi phương thức refresh
-                    }
+                    lessonFragment.setEnrollStatus(isEnroll); // Gọi phương thức refresh
                     QuizFragment quizFragment = (QuizFragment) adapter.getFragment(2);
-                    if (quizFragment != null) {
-                        Log.d("isEnroll","true");
-                        quizFragment.setEnrollStatus(isEnroll); // Gọi phương thức refresh
-                    }
+                    quizFragment.setEnrollStatus(isEnroll); // Gọi phương thức refresh
+                    dismissLoadingDialog();
                     dialogSuccess();
                 }
                 else{
@@ -414,5 +452,46 @@ public class CourseDetailActivity extends AppCompatActivity {
             }
         });
     }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_CODE_PAYMENT && resultCode == RESULT_OK) {
+            String result = data.getStringExtra("result");
+
+
+            if ("success".equals(result)) {
+                // Xử lý kết quả thanh toán thành công
+                Log.d("result back","success");
+                isEnroll = true;
+                btnDangKy.setText("Đã đăng ký");
+                Fragment lessonFragment = getSupportFragmentManager().findFragmentByTag(LessonFragment.class.getSimpleName());
+
+                if (lessonFragment != null && lessonFragment instanceof LessonFragment) {
+                    // Nếu fragment tồn tại, cast và gọi phương thức setEnrollStatus
+                    ((LessonFragment) lessonFragment).setEnrollStatus(true); // Hoặc false tùy vào trạng thái
+                } else {
+                    // Fragment không tồn tại, có thể là do ViewPager2 đã không giữ fragment, bạn có thể xử lý lại bằng cách gọi setEnrollStatus khi fragment được tạo lại
+                    Log.e("CourseDetailActivity", "LessonFragment is not found.");
+                }
+                Fragment quizzFragment = getSupportFragmentManager().findFragmentByTag(QuizFragment.class.getSimpleName());
+
+                if (quizzFragment != null && quizzFragment instanceof QuizFragment) {
+                    // Nếu fragment tồn tại, cast và gọi phương thức setEnrollStatus
+                    ((QuizFragment) quizzFragment).setEnrollStatus(true); // Hoặc false tùy vào trạng thái
+                } else {
+                    // Fragment không tồn tại, có thể là do ViewPager2 đã không giữ fragment, bạn có thể xử lý lại bằng cách gọi setEnrollStatus khi fragment được tạo lại
+                    Log.e("CourseDetailActivity", "QuizFragment is not found.");
+                }
+                Toast.makeText(this, "Payment Successful!", Toast.LENGTH_SHORT).show();
+                // Cập nhật lại dữ liệu khóa học nếu cần
+            } else if ("canceled".equals(result)) {
+                Toast.makeText(this, "Payment Canceled", Toast.LENGTH_SHORT).show();
+            } else if ("error".equals(result)) {
+                Toast.makeText(this, "Payment Error", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
 
 }

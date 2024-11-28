@@ -25,18 +25,13 @@
             android:layout_toRightOf="@+id/btn_back"
             android:layout_alignParentEnd="true"
             android:background="@drawable/edittext_search"
-            android:layoutDirection="rtl" />
+            android:layoutDirection="rtl"
+            app:iconifiedByDefault="false"/>
     </RelativeLayout>
 
-    <TextView
-        android:textColor="@color/black"
-        android:textSize="22sp"
-        android:textAlignment="center"
-        android:textStyle="bold"
-        android:text="Danh mục khóa học"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+
     <androidx.core.widget.NestedScrollView
+        android:layout_marginTop="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <FrameLayout

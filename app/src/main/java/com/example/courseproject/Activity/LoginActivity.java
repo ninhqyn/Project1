@@ -69,11 +69,11 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(this,"Vui lòng nhập đầy đủ thông tin",Toast.LENGTH_SHORT).show();
                 return;
             }
-            if(!email.contains("@")){
+            /*if(!email.contains("@")){
                 dismissLoadingDialog(); // Dismiss on error
                 Toast.makeText(this,"Email không hợp lệ",Toast.LENGTH_SHORT).show();
                 return;
-            }
+            }*/
             signIn(email,password);
         });
 
@@ -154,12 +154,12 @@ public class LoginActivity extends AppCompatActivity {
                             DataLocalManager.setFullName(user.getFullName());
                             DataLocalManager.setPhoneNumber(user.getPhoneNumber());
                             DataLocalManager.setLocation(user.getLocation());
+
                         }
                     }
 
                     @Override
                     public void onFailure(Call<User> call, Throwable t) {
-                        dismissLoadingDialog();
                         Toast.makeText(LoginActivity.this, "Fail to call api ", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -167,6 +167,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<TokenModel> call, Throwable t) {
+                dismissLoadingDialog();
                 Toast.makeText(LoginActivity.this, "Fail to call api Login", Toast.LENGTH_SHORT).show();
             }
         });

@@ -33,6 +33,8 @@ import com.example.courseproject.SharedPerferences.DataLocalManager;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
@@ -63,6 +65,7 @@ public class NotificationActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        Log.d("Notification",DataLocalManager.isUserLoggedIn()+"");
         tvOtherNotification = findViewById(R.id.tv_other_notification);
         loadingToday = findViewById(R.id.loading_notification);
         loadingOther = findViewById(R.id.loading_notification_2);
@@ -161,6 +164,7 @@ public class NotificationActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<List<Notification>> call, Response<List<Notification>> response) {
                 if (response.isSuccessful() && response.body() != null) {
+                    Log.d("Notification",response.message());
                     List<Notification> allNotifications = response.body();
                     List<Notification> todayNotifications = new ArrayList<>();
                     List<Notification> otherNotifications = new ArrayList<>();
@@ -178,15 +182,18 @@ public class NotificationActivity extends AppCompatActivity {
 
                     for (Notification notification : allNotifications) {
                         try {
-                            LocalDateTime notificationDateTime = LocalDateTime.parse(notification.getCreatedAt(), formatter);
-                            LocalDate notificationDate = notificationDateTime.toLocalDate();
+                            // Đọc thời gian theo UTC và chuyển sang múi giờ địa phương
+                            ZonedDateTime notificationZonedDateTime = ZonedDateTime.parse(notification.getCreatedAt(), formatter.withZone(ZoneId.of("UTC")));
+                            ZonedDateTime localDateTime = notificationZonedDateTime.withZoneSameInstant(ZoneId.systemDefault()); // Chuyển đổi sang múi giờ hệ thống (địa phương)
+
+                            LocalDate notificationDate = localDateTime.toLocalDate();
 
                             if (notificationDate.isEqual(today)) {
                                 todayNotifications.add(notification);
                             } else {
                                 otherNotifications.add(notification);
                             }
-                        } catch (Exception e) {
+                        } catch (DateTimeParseException e) {
                             e.printStackTrace();
                         }
                     }
@@ -215,20 +222,30 @@ public class NotificationActivity extends AppCompatActivity {
                         rcvNotification2.setVisibility(View.VISIBLE); // Hiện RecyclerView trước đó
                     }
                     if (allNotifications.isEmpty()){
-                      loadingToday.setVisibility(View.GONE);
-                      loadingOther.setVisibility(View.GONE);
-                      tvNoNotificationsToday.setVisibility(View.VISIBLE);
-                      tvOtherNotification.setVisibility(View.GONE);
-                      rcvNotification2.setVisibility(View.GONE);
-                      rcvNotification.setVisibility(View.GONE);
+                        loadingToday.setVisibility(View.GONE);
+                        loadingOther.setVisibility(View.GONE);
+                        tvNoNotificationsToday.setVisibility(View.VISIBLE);
+                        tvOtherNotification.setVisibility(View.GONE);
+                        rcvNotification2.setVisibility(View.GONE);
+                        rcvNotification.setVisibility(View.GONE);
 
-                      TextView tvToday = findViewById(R.id.tv_today);
-                      tvToday.setVisibility(View.GONE);
-                      TextView tvNoNotification = findViewById(R.id.tv_no_notification);
-                      ImageView imgNoNotification = findViewById(R.id.img_no_notification);
-                      tvNoNotification.setVisibility(View.VISIBLE);
-                      imgNoNotification.setVisibility(View.VISIBLE);
+                        TextView tvToday = findViewById(R.id.tv_today);
+                        tvToday.setVisibility(View.GONE);
+                        TextView tvNoNotification = findViewById(R.id.tv_no_notification);
+                        ImageView imgNoNotification = findViewById(R.id.img_no_notification);
+                        tvNoNotification.setVisibility(View.VISIBLE);
+                        imgNoNotification.setVisibility(View.VISIBLE);
                     }
+                }else {
+                    loadingToday.setVisibility(View.GONE);
+                    loadingOther.setVisibility(View.GONE);
+                    TextView tvToday = findViewById(R.id.tv_today);
+                    tvToday.setVisibility(View.GONE);
+                    tvOtherNotification.setVisibility(View.GONE);
+                    TextView tvNoNotification = findViewById(R.id.tv_no_notification);
+                    ImageView imgNoNotification = findViewById(R.id.img_no_notification);
+                    tvNoNotification.setVisibility(View.VISIBLE);
+                    imgNoNotification.setVisibility(View.VISIBLE);
                 }
             }
 

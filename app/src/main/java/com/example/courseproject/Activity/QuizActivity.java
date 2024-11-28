@@ -25,13 +25,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.courseproject.Adapter.QuestionAdapter;
 import com.example.courseproject.Api.ApiClient;
 import com.example.courseproject.Model.Answer;
+import com.example.courseproject.Model.Certificate;
 import com.example.courseproject.Model.Enrollment;
 import com.example.courseproject.Model.NonScrollableRecyclerView;
 import com.example.courseproject.Model.Question;
 import com.example.courseproject.Model.Quiz;
 import com.example.courseproject.Model.QuizResult;
 import com.example.courseproject.R;
+import com.example.courseproject.Service.CertificateService;
 import com.example.courseproject.Service.EnrollmentService;
+import com.example.courseproject.Service.Percentage;
 import com.example.courseproject.Service.QuestionService;
 import com.example.courseproject.Service.QuizResultService;
 import com.example.courseproject.Service.QuizService;
@@ -64,6 +67,7 @@ public class QuizActivity extends AppCompatActivity {
     private TextView tvTimeQuiz;
     private int quizID = 0,enrollmentId = 0;
     private ConstraintLayout layout;
+    Enrollment enrollment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -211,7 +215,17 @@ public class QuizActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<Unit> call, Response<Unit> response) {
                  if (response.isSuccessful()){
-                    dialogQuizResult(score);
+                     Intent resultIntent = new Intent();
+                     setResult(Activity.RESULT_OK, resultIntent);
+                     Intent intent = new Intent(QuizActivity.this,QuizResultActivity.class);
+                     intent.putExtra("score",score);
+                     Bundle bundle = new Bundle();
+                     bundle.putSerializable("enrollment",enrollment);
+                     intent.putExtras(bundle);
+                     startActivity(intent);
+
+
+                     finish();
                 }
 
             }
@@ -223,34 +237,8 @@ public class QuizActivity extends AppCompatActivity {
         });
     }
 
-    private void dialogQuizResult(double score) {
-        final Dialog dialog = new Dialog(QuizActivity.this);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.dialog_result);
-        Window window = dialog.getWindow();
-        if (window != null) {
-            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
-            window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-            window.setBackgroundDrawableResource(R.drawable.transparent_background);
-        }
-        dialog.setCancelable(false);
 
-        TextView tvPoint = dialog.findViewById(R.id.tvPoint);
-        ImageView btnCancel = dialog.findViewById(R.id.btn_cancel);
-        tvPoint.setText(score+"");
 
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent resultIntent = new Intent();
-                setResult(Activity.RESULT_OK, resultIntent);
-                dialog.dismiss();
-                finish();
-            }
-        });
-        layout.setVisibility(View.INVISIBLE);
-        dialog.show();
-    }
 
     private void callApiEnrollmentId() {
         EnrollmentService apiService = ApiClient.getClient(true).create(EnrollmentService.class);
@@ -258,8 +246,9 @@ public class QuizActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<Enrollment> call, Response<Enrollment> response) {
                 if (response.isSuccessful() && response.body()!=null){
-                    Enrollment enrollment = response.body();
-                    enrollmentId =  enrollment.getEnrollmentId();
+                    Enrollment enroll = response.body();
+                    enrollment = response.body();
+                    enrollmentId =  enroll.getEnrollmentId();
                     Log.e("enrollmentID", enrollmentId+"" );
                 }
                 else {

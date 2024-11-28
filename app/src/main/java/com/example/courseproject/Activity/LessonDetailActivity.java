@@ -12,11 +12,13 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -54,14 +56,17 @@ public class LessonDetailActivity extends AppCompatActivity {
     TextView tvTitle;
     //WebView webView;
     SimpleExoPlayer player;
+    PlayerView playerView;
     Lesson lesson;
+    private FrameLayout videoContainer;
     //
     ImageButton btnFullscreen;
-   // private boolean isFullScreen = false;
+    private boolean isFullScreen = false;
     int enrollmentId ;
 
     private TabLayout tabLayout;
     private ViewPager2 viewPager2;
+    private ConstraintLayout mainLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,6 +79,8 @@ public class LessonDetailActivity extends AppCompatActivity {
         });
 
         //
+        mainLayout = findViewById(R.id.main);
+        videoContainer = findViewById(R.id.video_container);
         img_btn_back = findViewById(R.id.img_lesson_detalis_back);
         tvTitle = findViewById(R.id.tv_title_lesson_details);
         //webView = findViewById(R.id.video_lesson);
@@ -94,7 +101,7 @@ public class LessonDetailActivity extends AppCompatActivity {
         btnFullscreen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                /*
                 int orientation =LessonDetailActivity.this.getResources().getConfiguration().orientation;
                 if (orientation == Configuration.ORIENTATION_PORTRAIT) {
                     //fullscreenButton.setImageDrawable(ContextCompat.getDrawable(context,
@@ -105,8 +112,8 @@ public class LessonDetailActivity extends AppCompatActivity {
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
 
-
-                }
+                }*/
+                toggleFullscreen();
 
             }
         });
@@ -132,7 +139,7 @@ public class LessonDetailActivity extends AppCompatActivity {
             webView.loadUrl(embedUrl);*/
 
             //
-            PlayerView playerView = findViewById(R.id.video_player);
+            playerView = findViewById(R.id.video_player);
             player = new SimpleExoPlayer.Builder(this).build();
             playerView.setPlayer(player);
             playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
@@ -190,6 +197,49 @@ public class LessonDetailActivity extends AppCompatActivity {
 
     }
 
+    // Toggle fullscreen mode
+    private void toggleFullscreen() {
+        if (isFullScreen) {
+            // Exit fullscreen: change orientation back to portrait
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            restoreLayoutForPortrait();
+        } else {
+            // Enter fullscreen: change orientation to landscape
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            enterFullScreen();
+        }
+        isFullScreen = !isFullScreen;
+    }
+
+    // Enter fullscreen mode: change layout params to match parent
+    private void enterFullScreen() {
+        // Hide system UI like status bar and navigation bar
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        // Hide toolbar or action bar
+        //getSupportActionBar().hide();
+
+        // Adjust the player container layout
+        ViewGroup.LayoutParams params = videoContainer.getLayoutParams();
+        params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+        params.height = ViewGroup.LayoutParams.MATCH_PARENT;
+        videoContainer.setLayoutParams(params);
+    }
+
+    // Restore layout when exiting fullscreen
+    private void restoreLayoutForPortrait() {
+        // Show the system UI back (status bar, navigation bar)
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        // Show toolbar or action bar
+        //getSupportActionBar().show();
+
+        // Adjust the player container layout for portrait mode
+        ViewGroup.LayoutParams params = videoContainer.getLayoutParams();
+        params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+        params.height = getResources().getDimensionPixelSize(R.dimen.video_player_height); // Original height (e.g., 300dp)
+        videoContainer.setLayoutParams(params);
+    }
+
+
     private void callApiProgress() {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SS");
@@ -218,20 +268,7 @@ public class LessonDetailActivity extends AppCompatActivity {
 
 
 
-/*
-    public String getYouTubeVideoId(String url) {
-        String videoId = null;
-        // Cập nhật regex để hỗ trợ nhiều dạng URL
-        String regex = "^(?:https?:\\/\\/)?(?:www\\.)?(?:youtube\\.com\\/watch\\?v=|youtu\\.be\\/|youtube\\.com\\/embed\\/)([a-zA-Z0-9_-]{11})";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(url);
 
-        if (matcher.find()) {
-            videoId = matcher.group(1);
-        }
-
-        return videoId;
-    }*/
 
     @Override
     protected void onStart() {

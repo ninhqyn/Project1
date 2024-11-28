@@ -22,6 +22,13 @@ import com.example.courseproject.Service.NotificationService;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -59,109 +66,84 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     @Override
     public void onBindViewHolder(@NonNull NotificationViewHolder holder, int position) {
         Notification notification = notificationList.get(position);
-        if(notification==null){
+        if (notification == null) {
             return;
         }
+
+        // Set title and content
         holder.tvTitle.setText(notification.getTitle());
         holder.tvContent.setText(notification.getMessage());
 
-        //TODO: set image
+        // TODO: set image
 
         String time = notification.getCreatedAt();
 
-        // Định dạng chuỗi thời gian
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SS");
-        Date date = null;
+        // Define a formatter that can handle the input time format (with milliseconds)
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+
+        // Parse the time string to LocalDateTime (assume it's UTC for now)
+        LocalDateTime notificationDateTime = null;
         try {
-            date = dateFormat.parse(time);
-        } catch (ParseException e) {
+            notificationDateTime = LocalDateTime.parse(time, formatter);
+        } catch (DateTimeParseException e) {
             e.printStackTrace();
         }
 
-        // Tạo Calendar từ Date
-        Calendar setDate = Calendar.getInstance();
-        setDate.setTime(date);
+        if (notificationDateTime != null) {
+            // Assume the time is in UTC, and convert it to the device's local time zone
+            ZonedDateTime utcDateTime = ZonedDateTime.of(notificationDateTime, ZoneOffset.UTC);
+            ZonedDateTime localDateTime = utcDateTime.withZoneSameInstant(ZoneId.systemDefault());
 
-        // Lấy ngày hiện tại
-        Calendar currentDate = Calendar.getInstance();
+            // Calculate the time difference from now
+            Duration duration = Duration.between(localDateTime, ZonedDateTime.now());
 
-        // Tính khoảng cách
-        long differenceMillis = currentDate.getTimeInMillis() - setDate.getTimeInMillis();
-        long differenceSeconds = differenceMillis / 1000;
-        long differenceMinutes = differenceSeconds / 60;
-        long differenceHours = differenceMinutes / 60;
-        long differenceDays = differenceHours / 24;
-        long differenceMonths = differenceDays / 30;
-        long differenceYears = differenceMonths / 12;
-
-        String displayText;
-
-        if (differenceYears > 0) {
-            displayText = String.format("%d năm", differenceYears);
-        } else if (differenceMonths > 0) {
-            displayText = String.format("%d tháng", differenceMonths);
-        } else if (differenceDays > 0) {
-            displayText = String.format("%d ngày", differenceDays);
-        } else if (differenceHours > 0) {
-            displayText = String.format("%d giờ", differenceHours);
-        } else if (differenceMinutes > 0) {
-            displayText = String.format("%d phút", differenceMinutes);
-        } else {
-            displayText = "Vừa mới";
+            // Display the time difference in a readable format
+            String displayText = formatDuration(duration);
+            holder.tvDate.setText(displayText);
         }
 
-        holder.tvDate.setText(displayText);
+        // Set click listeners for various views
+        holder.btnMenu.setOnClickListener(v -> {
+            PopupMenu popupMenu = new PopupMenu(context, holder.btnMenu);
+            popupMenu.getMenuInflater().inflate(R.menu.notification_menu, popupMenu.getMenu());
 
-        holder.btnMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PopupMenu popupMenu = new PopupMenu(context, holder.btnMenu);
-                popupMenu.getMenuInflater().inflate(R.menu.notification_menu, popupMenu.getMenu());
+            popupMenu.setOnMenuItemClickListener(item -> {
+                if (item.getItemId() == R.id.option_1) {
+                    //TODO: Xóa
+                    menuListener.onClickMenuNotification(notification);
+                }
+                return false;
+            });
 
-                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        if(item.getItemId() == R.id.option_1){
-                            //TODO: Xóa
-                            menuListener.onClickMenuNotification(notification);
-                        }else {
-
-                        }
-                        return false;
-                    }
-                });
-
-                // Hiện menu
-                popupMenu.show();
-
-            }
+            popupMenu.show();
         });
 
-        holder.img.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                listener.onClickItemNotification(notification);
-            }
-        });
-        holder.tvTitle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                listener.onClickItemNotification(notification);
-            }
-        });
-        holder.tvContent.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                listener.onClickItemNotification(notification);
-            }
-        });
-        holder.layoutItem.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                listener.onClickItemNotification(notification);
-            }
-        });
+        // Set onClickListeners for item views
+        View.OnClickListener itemClickListener = v -> listener.onClickItemNotification(notification);
+        holder.img.setOnClickListener(itemClickListener);
+        holder.tvTitle.setOnClickListener(itemClickListener);
+        holder.tvContent.setOnClickListener(itemClickListener);
+        holder.layoutItem.setOnClickListener(itemClickListener);
     }
+
+    // Helper method to format the duration as a human-readable string
+    private String formatDuration(Duration duration) {
+        long seconds = duration.getSeconds();
+        if (seconds < 60) {
+            return "Vừa mới";
+        } else if (seconds < 3600) {
+            return String.format("%d phút", seconds / 60);
+        } else if (seconds < 86400) {
+            return String.format("%d giờ", seconds / 3600);
+        } else if (seconds < 2592000) { // less than a month
+            return String.format("%d ngày", seconds / 86400);
+        } else if (seconds < 31536000) { // less than a year
+            return String.format("%d tháng", seconds / 2592000);
+        } else {
+            return String.format("%d năm", seconds / 31536000);
+        }
+    }
+
 
 
 

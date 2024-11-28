@@ -9,6 +9,7 @@
     tools:context=".Activity.LoginActivity">
 
     <LinearLayout
+
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -78,7 +79,7 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/signup" />
+        app:srcCompat="@drawable/dashbord_img" />
 
     <TextView
         android:id="@+id/tvForgotPassword"
@@ -99,7 +100,6 @@
         android:id="@+id/txtSignUp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="88dp"
         android:text="Bạn không có tài khoản? Sign up"
         android:textColor="@color/black"
         android:textSize="18sp"
@@ -107,7 +107,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvForgotPassword"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintVertical_bias="0.60" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

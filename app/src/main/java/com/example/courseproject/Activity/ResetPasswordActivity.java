@@ -77,8 +77,11 @@ public class ResetPasswordActivity extends AppCompatActivity {
                 Log.d("Response", "Response code: " + response.code() + " Response message: " + response.message());
                 if(response.isSuccessful()){
                     Toast.makeText(ResetPasswordActivity.this,"Mật khẩu đã được thay đổi",Toast.LENGTH_SHORT).show();
-                    //Intent intent = new Intent(ResetPasswordActivity.this,TrangChuActitvity.class);
-                    //startActivity(intent);
+                    Toast.makeText(ResetPasswordActivity.this,"Chuyển hướng đến trang đăng nhập",Toast.LENGTH_SHORT).show();
+
+                    Intent intent = new Intent(ResetPasswordActivity.this,LoginActivity.class);
+                    startActivity(intent);
+                    finish();
                 }else {
                     Toast.makeText(ResetPasswordActivity.this,"Error message",Toast.LENGTH_SHORT).show();
                 }

@@ -93,8 +93,9 @@ public class EditProfileActivity extends AppCompatActivity {
         edtFullName = findViewById(R.id.edit_full_name);
         edtAddress = findViewById(R.id.edit_address);
         edtPhone = findViewById(R.id.edit_phone);
-
-
+        edtFullName.setText(DataLocalManager.getFullName());
+        edtAddress.setText(DataLocalManager.getLocation());
+        edtPhone.setText(DataLocalManager.getPhoneNumber());
         Glide.with(EditProfileActivity.this)
                 .load(DataLocalManager.getImage())
                 .placeholder(android.R.drawable.ic_delete)
@@ -121,6 +122,10 @@ public class EditProfileActivity extends AppCompatActivity {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(edtFullName.getText()==null || edtAddress.getText()==null || edtPhone.getText()==null){
+                    Toast.makeText(EditProfileActivity.this,"Vui lòng nhập đầy đủ thông tin",Toast.LENGTH_LONG).show();
+                    return;
+                }
                 callApiUpdateUser();
             }
         });

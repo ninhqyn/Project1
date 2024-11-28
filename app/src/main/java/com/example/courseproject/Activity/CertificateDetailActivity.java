@@ -16,6 +16,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.bumptech.glide.Glide;
 import com.example.courseproject.Model.Certificate;
 import com.example.courseproject.Model.CertificateTemplate;
+import com.example.courseproject.Model.DateUtils;
 import com.example.courseproject.R;
 
 public class CertificateDetailActivity extends AppCompatActivity {
@@ -40,7 +41,9 @@ public class CertificateDetailActivity extends AppCompatActivity {
         Certificate certificate = (Certificate) getIntent().getSerializableExtra("certificate");
         CertificateTemplate template = (CertificateTemplate) getIntent().getSerializableExtra("template");
         tvTitle.setText(template.getTemplateName());
-        tvDate.setText(certificate.getIssuedAt());
+        String date = certificate.getIssuedAt();
+
+        tvDate.setText("Ngày cấp : "+ DateUtils.convertToDate(date) );
         Glide.with(this).load(template.getImage()).into(imgCertificate);
         btnShare.setOnClickListener(new View.OnClickListener() {
             @Override

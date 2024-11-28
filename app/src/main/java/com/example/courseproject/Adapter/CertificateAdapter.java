@@ -57,7 +57,7 @@ public class CertificateAdapter extends RecyclerView.Adapter<CertificateAdapter.
 
     private void callApiGetCertificateTemplate(Certificate certificate, CertificateViewHolder holder) {
         CertificateService certificateService = ApiClient.getClient(true).create(CertificateService.class);
-        Call<CertificateTemplate> call = certificateService.getCertificateTemplateById(certificate.getTemplateId());
+        Call<CertificateTemplate> call = certificateService.getCertificateTemplateEnrollmentId(certificate.getEnrollmentId());
         call.enqueue(new Callback<CertificateTemplate>() {
             @Override
             public void onResponse(Call<CertificateTemplate> call, Response<CertificateTemplate> response) {

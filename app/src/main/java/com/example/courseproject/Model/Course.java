@@ -11,10 +11,19 @@ public class Course implements Serializable {
     private String description;
     private String image;
     private Double price; // Nullable, nên dùng Double thay vì double
+    private int templateId;
     private String createdAt; // Giữ dưới dạng String để chuyển đổi
     private String updatedAt; // Giữ dưới dạng String để chuyển đổi
 
     // Getter và Setter cho tất cả các trường
+
+    public int getTemplateId() {
+        return templateId;
+    }
+
+    public void setTemplateId(int templateId) {
+        this.templateId = templateId;
+    }
 
     public int getCourseId() {
         return courseId;

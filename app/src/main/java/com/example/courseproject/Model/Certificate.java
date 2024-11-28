@@ -5,15 +5,24 @@ import java.io.Serializable;
 public class Certificate implements Serializable {
     private int certificateId;
     private int enrollmentId;
-    private int templateId;
+    private double percentage;
     private String issuedAt;
 
-    public Certificate(int certificateId, int enrollmentId, int templateId, String issuedAt) {
+    public Certificate(int certificateId, int enrollmentId, double percentage, String issuedAt) {
         this.certificateId = certificateId;
         this.enrollmentId = enrollmentId;
-        this.templateId = templateId;
+        this.percentage = percentage;
         this.issuedAt = issuedAt;
     }
+
+    public double getPercentage() {
+        return percentage;
+    }
+
+    public void setPercentage(double percentage) {
+        this.percentage = percentage;
+    }
+
 
     public int getCertificateId() {
         return certificateId;
@@ -29,14 +38,6 @@ public class Certificate implements Serializable {
 
     public void setEnrollmentId(int enrollmentId) {
         this.enrollmentId = enrollmentId;
-    }
-
-    public int getTemplateId() {
-        return templateId;
-    }
-
-    public void setTemplateId(int templateId) {
-        this.templateId = templateId;
     }
 
     public String getIssuedAt() {

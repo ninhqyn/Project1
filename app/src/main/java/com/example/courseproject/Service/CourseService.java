@@ -16,4 +16,6 @@ public interface CourseService {
     Call<List<Course>> getAllCourseByUserId(@Path("userId") int userId,@Path("status") String status);
     @GET("Course/GetCourseById/{courseId}")
     Call<Course> getCourseById(@Path("courseId") int courseId);
+    @GET("Course/GetAllNewCourse")
+    Call<List<Course>> getAllCourseByNew();
 }

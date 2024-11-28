@@ -11,8 +11,10 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.LinearSnapHelper;
 import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SnapHelper;
 
 import android.os.Handler;
 import android.util.Log;
@@ -146,7 +148,8 @@ public class HomeFragment extends Fragment {
         //List popular course
         recyclerViewCourse =v.findViewById(R.id.recycler_view_course);
         LinearLayoutManager linearLayoutManager2 = new LinearLayoutManager(getContext(),RecyclerView.HORIZONTAL,false);
-
+        SnapHelper snapHelper = new LinearSnapHelper();
+        snapHelper.attachToRecyclerView(recyclerViewCourse);
         recyclerViewCourse.setLayoutManager(linearLayoutManager2);
         courseAdapter = new CourseAdapter(getContext(), new IClickItemCourseListener() {
             @Override
@@ -170,6 +173,8 @@ public class HomeFragment extends Fragment {
         recyclerCourseFree = v.findViewById(R.id.rcv_course_free);
         LinearLayoutManager linearLayoutManager3 = new LinearLayoutManager(getContext(),RecyclerView.HORIZONTAL,false);
         recyclerCourseFree.setLayoutManager(linearLayoutManager3);
+        SnapHelper snapHelper2 = new LinearSnapHelper();
+        snapHelper2.attachToRecyclerView(recyclerCourseFree);
         courseAdapterFree = new CourseAdapter(getContext(), new IClickItemCourseListener() {
             @Override
             public void onClickItemCourse(Course course) {
@@ -205,7 +210,7 @@ public class HomeFragment extends Fragment {
         recyclerViewNewCourse.setLayoutManager(linearLayoutManager4);
         newCourseAdapter = new NewCourseAdapter(getContext());
         recyclerViewNewCourse.setAdapter(newCourseAdapter);
-        //getListNewCourse();
+        getListNewCourse();
 
         //
         CircleIndicator2 indicatorNewCourse = v.findViewById(R.id.indicator_new_course);
@@ -286,6 +291,8 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onFailure(Call<List<com.example.courseproject.Model.Notification>> call, Throwable t) {
+                Toast.makeText(getContext(), "Failed to call api get category", Toast.LENGTH_SHORT).show();
+                Log.e("Error fail", t.getMessage());
 
             }
         });
@@ -315,7 +322,13 @@ public class HomeFragment extends Fragment {
             public void onResponse(Call<List<Category>> call, Response<List<Category>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<Category> categoryList = response.body();
-                    categoryAdapter.setData(categoryList);
+                    List<Category> categories = new ArrayList<>();
+                    for(int i = 0;i<6;i++){
+                        if(i<categoryList.size()){
+                            categories.add(categoryList.get(i));
+                        }
+                    }
+                    categoryAdapter.setData(categories);
                     categoryAdapter.notifyDataSetChanged();
                     loadingCategory.setVisibility(View.GONE);
 
@@ -331,6 +344,35 @@ public class HomeFragment extends Fragment {
             }
         });
     }
+    private void getListNewCourse(){
+        CourseService apiService  =ApiClient.getClient(true).create(CourseService.class);
+        apiService.getAllCourseByNew().enqueue(new Callback<List<Course>>() {
+            @Override
+            public void onResponse(Call<List<Course>> call, Response<List<Course>> response) {
+                loadingNewCourse.setVisibility(View.GONE);
+                if(response.isSuccessful() && response.body()!=null){
+                    List<Course> courseList = response.body();
+                    List<Course> list = new ArrayList<>();
+                    for(int i =0;i<4;i++){
+                        if(i<courseList.size()){
+                            list.add(courseList.get(i));
+                        }
+
+                    }
+                    newCourseAdapter.setData(list);
+                    newCourseAdapter.notifyDataSetChanged();
+
+                }else {
+                    Toast.makeText(getContext(), "No courses found", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Course>> call, Throwable t) {
+
+            }
+        });
+    }
 
     private void getListCourse() {
         CourseService apiService = ApiClient.getClient(true).create(CourseService.class);
@@ -339,7 +381,15 @@ public class HomeFragment extends Fragment {
             public void onResponse(Call<List<Course>> call, Response<List<Course>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<Course> courseList = response.body();
-                    courseAdapter.setData(courseList);
+
+                    List<Course> coursePopular = new ArrayList<>();
+                    for(int i =0;i<10;i++){
+                        if(i<courseList.size()){
+                            coursePopular.add(courseList.get(i));
+                        }
+
+                    }
+                    courseAdapter.setData(coursePopular);
                     courseAdapter.notifyDataSetChanged();
                     loadingCourse.setVisibility(View.GONE);
 
@@ -353,21 +403,6 @@ public class HomeFragment extends Fragment {
                     courseAdapterFree.setData(courseFreeList);
                     courseAdapterFree.notifyDataSetChanged();
                     loadingCourseFree.setVisibility(View.GONE);
-
-
-                    //new course
-                    int count = 0;
-                    List<Course> newCourseList = new ArrayList<>();
-                    for(int i=0;i<courseList.size();i++){
-                        if(count < 3){
-                            newCourseList.add(courseList.get(i));
-                            count++;
-                        }
-                    }
-                    newCourseAdapter.setData(newCourseList);
-                    newCourseAdapter.notifyDataSetChanged();
-                    loadingNewCourse.setVisibility(View.GONE);
-
                 } else {
                     Toast.makeText(getContext(), "No courses found", Toast.LENGTH_SHORT).show();
                 }

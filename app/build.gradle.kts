@@ -9,8 +9,8 @@ android {
 
     defaultConfig {
         applicationId = "com.example.courseproject"
-        minSdk = 34
-        targetSdk = 34
+        minSdk = 28
+        targetSdk = 28
         versionCode = 1
         versionName = "1.0"
 
@@ -46,6 +46,16 @@ dependencies {
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
     implementation(libs.firebase.messaging)
+    implementation(fileTree(mapOf(
+        "dir" to "D:\\zalopay",
+        "include" to listOf("*.aar", "*.jar"),
+        "exclude" to listOf("")
+    )))
+    implementation(fileTree(mapOf(
+        "dir" to "C:\\Users\\Lenovo\\Downloads\\Sample_Android_Native_Mobile SDK_1.0.25 (1)",
+        "include" to listOf("*.aar", "*.jar"),
+        "exclude" to listOf("")
+    )))
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -81,6 +91,6 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore")
 
     implementation ("com.airbnb.android:lottie:5.2.0")
-
+    implementation("com.squareup.okhttp3:okhttp:4.6.0")
 
 }

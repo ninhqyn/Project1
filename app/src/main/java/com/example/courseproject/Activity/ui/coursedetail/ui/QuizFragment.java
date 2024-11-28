@@ -1,6 +1,7 @@
 package com.example.courseproject.Activity.ui.coursedetail.ui;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -12,18 +13,30 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.courseproject.Activity.CertificateActivity;
+import com.example.courseproject.Activity.CertificateDetailActivity;
 import com.example.courseproject.Activity.QuizActivity;
 import com.example.courseproject.Activity.ui.coursedetail.CourseDetailActivity;
 import com.example.courseproject.Api.ApiClient;
+import com.example.courseproject.Model.CalculateProgress;
+import com.example.courseproject.Model.Certificate;
+import com.example.courseproject.Model.CertificateTemplate;
 import com.example.courseproject.Model.Course;
+import com.example.courseproject.Model.DateUtils;
 import com.example.courseproject.Model.Enrollment;
 import com.example.courseproject.Model.QuizResult;
 import com.example.courseproject.R;
+import com.example.courseproject.Service.CertificateService;
 import com.example.courseproject.Service.EnrollmentService;
 import com.example.courseproject.Service.Percentage;
+import com.example.courseproject.Service.ProgressService;
 import com.example.courseproject.Service.QuizResultService;
 import com.example.courseproject.SharedPerferences.DataLocalManager;
 
@@ -44,7 +57,11 @@ public class QuizFragment extends Fragment {
     private int enrollmentId;
     private TextView tvGrade,tvDanhGia,tvContentDanhGia;
     private TextView tvDateEnd,tvTimeEnd;
-    private TextView tvDateNow,tvDate;;
+    private TextView tvDateNow,tvDate;
+    private double progress;
+    private TextView tvCertificate;
+    private TextView tvSeeCertificate;
+    Enrollment enrollment;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,7 +74,9 @@ public class QuizFragment extends Fragment {
         isEnroll = getArguments().getBoolean("isEnroll");
         if(isEnroll){
             callApiEnrollmentId();
+
         }
+
         // Inflate the layout for this
         View v = inflater.inflate(R.layout.fragment_quiz, container, false);
         btnStart = v.findViewById(R.id.btn_submit);
@@ -65,9 +84,15 @@ public class QuizFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if(isEnroll){
-                    Intent intent = new Intent(getContext(), QuizActivity.class);
-                    intent.putExtra("courseId",getArguments().getInt("courseId"));
-                    startActivityForResult(intent, 1);
+                    if(progress == 100){
+                        Intent intent = new Intent(getContext(), QuizActivity.class);
+                        intent.putExtra("courseId",getArguments().getInt("courseId"));
+                        startActivityForResult(intent, 1);
+                    }else {
+                        createDialog();
+                    }
+                }else {
+                    Toast.makeText(getContext(),"Chưa đăng ký",Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -90,13 +115,17 @@ public class QuizFragment extends Fragment {
 
         tvDateEnd = v.findViewById(R.id.tv_time_end);
         tvTimeEnd = v.findViewById(R.id.time_end);
-
-
         tvGrade = v.findViewById(R.id.tv_grade);
         tvDanhGia = v.findViewById(R.id.textView9);
         tvContentDanhGia = v.findViewById(R.id.textView10);
-        if(isFirsTime){
 
+        tvCertificate = v.findViewById(R.id.tv_certificate);
+        tvSeeCertificate = v.findViewById(R.id.see_certificate);
+        tvCertificate.setVisibility(View.GONE);
+        tvSeeCertificate.setVisibility(View.GONE);
+
+
+        if(isFirsTime){
             tvDateEnd.setVisibility(View.GONE);
             tvTimeEnd.setVisibility(View.GONE);
             tvGrade.setText("_ _");
@@ -109,9 +138,94 @@ public class QuizFragment extends Fragment {
             tvDateNow.setVisibility(View.GONE);
             btnStart.setText("Làm lại");
         }
+        tvSeeCertificate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                callApiCertificate();
+            }
+        });
 
         return v;
     }
+
+    private void callApiCertificate() {
+        Log.d("Certificate",enrollmentId+"");
+        CertificateService certificateService = ApiClient.getClient(true).create(CertificateService.class);
+        certificateService.getCertificateByEnrollmentId(enrollmentId).enqueue(new Callback<Certificate>() {
+            @Override
+            public void onResponse(Call<Certificate> call, Response<Certificate> response) {
+                Log.d("Certificate",response.message());
+                if(response.isSuccessful() && response.body()!=null){
+                    Certificate certificate = response.body();
+                    callApiCertifcateTemplate(certificate);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Certificate> call, Throwable t) {
+                Log.d("Certificate",t.getMessage());
+            }
+        });
+    }
+
+    private void callApiCertifcateTemplate(Certificate certificate) {
+        Log.d("Certificate","call temp");
+        CertificateService certificateService = ApiClient.getClient(true).create(CertificateService.class);
+        certificateService.getCertificateTemplateEnrollmentId(enrollmentId).enqueue(new Callback<CertificateTemplate>() {
+            @Override
+            public void onResponse(Call<CertificateTemplate> call, Response<CertificateTemplate> response) {
+                Log.d("Certificate","call"+ response.message());
+                if(response.body()!=null && response.isSuccessful()){
+                    CertificateTemplate template = response.body();
+                    Intent intent = new Intent(getContext(),CertificateDetailActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable("certificate",certificate);
+                    bundle.putSerializable("template",template);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CertificateTemplate> call, Throwable t) {
+
+            }
+        });
+    }
+
+    private void createDialog() {
+        final Dialog dialog = new Dialog(getContext());
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_progress);
+        Window window = dialog.getWindow();
+
+        if (window != null) {
+            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
+            WindowManager.LayoutParams lp = window.getAttributes();
+            lp.dimAmount = 0.5f;
+            window.setAttributes(lp);
+            window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+            window.setBackgroundDrawableResource(R.drawable.background_loading);
+        }
+        dialog.setCancelable(false);
+        TextView tvClose = dialog.findViewById(R.id.tv_close);
+        ImageView imgCancel = dialog.findViewById(R.id.img_cancel);
+        tvClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        imgCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -122,18 +236,43 @@ public class QuizFragment extends Fragment {
             }
         }
     }
+    private void callApiProgress(){
+        ProgressService apiService = ApiClient.getClient(true).create(ProgressService.class);
+        apiService.calculateProgress(enrollmentId).enqueue(new Callback<CalculateProgress>() {
+            @Override
+            public void onResponse(Call<CalculateProgress> call, Response<CalculateProgress> response) {
+
+                if(response.isSuccessful() && response.body()!=null){
+                    CalculateProgress calculateProgress = response.body();
+                    progress = calculateProgress.getProgress();
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CalculateProgress> call, Throwable t) {
+
+            }
+        });
+
+    }
+
 
     private void callApiQuiz() {
         QuizResultService api = ApiClient.getClient(true).create(QuizResultService.class);
         api.getHighestQuizResult(getArguments().getInt("courseId"),enrollmentId).enqueue(new Callback<QuizResult>() {
             @Override
             public void onResponse(Call<QuizResult> call, Response<QuizResult> response) {
-                Log.d("Response", "onResponse:"+response.message());
-                Log.d("Response", "onResponse:"+getArguments().getInt("courseId")+" "+ enrollmentId + "");
                 if(response.isSuccessful()){
                     if(response.body()!=null){
                         QuizResult quizResult = response.body();
-                         tvTimeEnd.setText(quizResult.getCreatedAt());
+                        String date = DateUtils.convertToDateTime(quizResult.getCreatedAt());
+                        if(date!=null){
+                            tvTimeEnd.setText(date);
+                        }else {
+                            tvTimeEnd.setText("26/09/2024");
+                        }
+
                          tvDateEnd.setVisibility(View.VISIBLE);
                          tvTimeEnd.setVisibility(View.VISIBLE);
                          callApiPercentage();
@@ -158,10 +297,12 @@ public class QuizFragment extends Fragment {
                 Log.d("Response", "onResponse:"+response.message());
                 if(response.isSuccessful() && response.body()!=null){
                     double percentageValue = response.body().grade(); // Get the grade
-                    if(percentageValue > 80){
-                        tvContentDanhGia.setText("Bạn đã đủ điều kiện để nhận chứng chỉ");
+                    if(percentageValue >= 80){
+                        tvContentDanhGia.setText("Bạn đã nhận được chứng chỉ");
+                        tvCertificate.setVisibility(View.VISIBLE);
+                        tvSeeCertificate.setVisibility(View.VISIBLE);
                     }else {
-                        tvContentDanhGia.setText("Để đạt được chứng chỉ điểm của bạn > 80%");
+                        tvContentDanhGia.setText("Để đạt được chứng chỉ điểm của bạn >= 80%");
                     }
                     // Format the output
                     String formattedPercentage;
@@ -183,14 +324,17 @@ public class QuizFragment extends Fragment {
 
     }
 
+
     private void callApiEnrollmentId() {
         EnrollmentService apiService = ApiClient.getClient(true).create(EnrollmentService.class);
         apiService.getEnrollmentByUserIdAndCourseId(DataLocalManager.getUserId(),getArguments().getInt("courseId")).enqueue(new Callback<Enrollment>() {
             @Override
             public void onResponse(Call<Enrollment> call, Response<Enrollment> response) {
                 if (response.isSuccessful() && response.body()!=null){
-                    Enrollment enrollment = response.body();
-                    enrollmentId =  enrollment.getEnrollmentId();
+                    Enrollment en = response.body();
+                    enrollment = response.body();
+                    enrollmentId =  en.getEnrollmentId();
+                    callApiProgress();
                     callApiQuiz();
                     Log.e("enrollmentID", enrollmentId+"1" );
                 }
@@ -209,5 +353,6 @@ public class QuizFragment extends Fragment {
     public void setEnrollStatus(boolean enroll) {
         this.isEnroll = enroll;
         callApiEnrollmentId();
+
     }
 }

@@ -73,6 +73,13 @@ public class DataLocalManager {
         return DataLocalManager.getInstance().mySharePreferences.getStringValue("Location");
     }
 
+    public  static void setPayment(Boolean payment){
+        DataLocalManager.getInstance().mySharePreferences.putBooleanValue("payment",payment);
+    }
+    public static boolean isPayment(){
+        return DataLocalManager.getInstance().mySharePreferences.getBooleanValue("payment");
+    }
+
 
 
 

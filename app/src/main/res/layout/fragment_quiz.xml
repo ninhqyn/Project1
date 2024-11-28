@@ -13,7 +13,7 @@
         <ImageView
             android:id="@+id/imageView4"
             android:layout_width="match_parent"
-            android:layout_height="150dp"
+            android:layout_height="120dp"
             android:src="@drawable/exam_16"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -42,7 +42,24 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.0">
-
+                <TextView
+                    android:gravity="center"
+                    android:id="@+id/tv_certificate"
+                    android:textStyle="bold"
+                    android:textSize="20sp"
+                    android:text="Chúc mừng \nbạn đã nhận được chứng chỉ"
+                    android:textColor="#E42424"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+                <TextView
+                    android:id="@+id/see_certificate"
+                    android:gravity="end"
+                    android:textSize="16sp"
+                    android:text="Xem ngay"
+                    android:textColor="@color/black"
+                    android:layout_marginBottom="50dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

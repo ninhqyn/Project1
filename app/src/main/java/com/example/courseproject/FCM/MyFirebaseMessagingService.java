@@ -43,8 +43,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(@NonNull RemoteMessage message) {
         super.onMessageReceived(message);
+        Log.d("Notification fcm", "Message received");
         if(DataLocalManager.isUserLoggedIn()){
-            Log.d("Notification", "Message received");
+
             RemoteMessage.Notification notification = message.getNotification();
             if(message.getData().size()>0){
                 String courseId = message.getData().get("course_id");
@@ -63,7 +64,29 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     private void sendNotificationDaily(String title, String body) {
+        Intent resultIntent;
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        resultIntent = new Intent(this, TrangChuActitvity.class);
+        stackBuilder.addNextIntentWithParentStack(new Intent(this, SplashActivity.class))
+                .addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(getNotificationId(),
+                        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+        Notification notification = new NotificationCompat.Builder(this, MyApplication.CHANNEL_ID)
+                .setContentTitle(title)
+                .setContentText(body)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher_foreground))
+                .setContentIntent(resultPendingIntent)
+                .setAutoCancel(true)
+                .build();
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.notify(getNotificationId(), notification);
+
+        Log.d("Notification", "Notification sent");
     }
+
 
 
     private void sendNotification(String title, String messageBody, String courseId) {

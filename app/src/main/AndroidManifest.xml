@@ -5,7 +5,7 @@
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
-
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -25,13 +25,31 @@
         android:theme="@style/Theme.CourseProject"
         tools:targetApi="31">
         <activity
+            android:name=".ZaloPay.ResultActivity"
+            android:exported="true"/>
+
+        <activity
+            android:name=".ZaloPay.OrderActivity"
+            android:exported="true"
+            android:label="Merchant Demo"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="demozpdk"
+                    android:host="app"
+                   />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".Activity.QuizResultActivity"
+            android:exported="false" />
+        <activity
             android:name=".Activity.ChangePasswordActivity"
             android:exported="false" />
         <activity
             android:name=".Activity.CertificateDetailActivity"
-            android:exported="false" />
-        <activity
-            android:name=".Activity.EditAccountActivity"
             android:exported="false" />
         <activity
             android:name=".Activity.ResetPasswordActivity"
@@ -109,6 +127,13 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+        <receiver android:name=".Receiver.NetWorkReceiver" android:enabled="true">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
+
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"

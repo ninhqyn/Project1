@@ -1,6 +1,7 @@
 package com.example.courseproject.Activity;
 
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -15,6 +16,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.courseproject.CustomViewPager.ViewPager2Adapter;
 import com.example.courseproject.R;
+import com.example.courseproject.Receiver.NetWorkReceiver;
 import com.example.courseproject.SharedPerferences.DataLocalManager;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -33,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
     private Handler handler;
     private Runnable runnable;
     private int currentIndex = 0;
+
+    private NetWorkReceiver networkReceiver;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        networkReceiver = new NetWorkReceiver();
         viewPager2 = findViewById(R.id.imageView);
         indicator = findViewById(R.id.indicator);
         imageList.add(R.drawable.dashbord_img);
@@ -81,7 +86,22 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Đăng ký BroadcastReceiver khi Activity được hiển thị
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+        filter.addAction("android.net.wifi.WIFI_STATE_CHANGED");
+        registerReceiver(networkReceiver, filter);
+    }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Hủy đăng ký BroadcastReceiver khi Activity không còn hiển thị
+        unregisterReceiver(networkReceiver);
+    }
     @Override
     protected void onDestroy() {
         super.onDestroy();

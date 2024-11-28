@@ -3,6 +3,7 @@ package com.example.courseproject.Adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,7 +61,9 @@ public class NewCourseAdapter extends RecyclerView.Adapter<NewCourseAdapter.NewC
             @Override
             public void onResponse(Call<Instructor> call, Response<Instructor> response) {
                 if (response.isSuccessful() && response.body() != null) {
+                    Log.d("Instructor", response.message());
                     Instructor instructor = response.body();
+                    Log.d("Instructor", instructor.getImage()+"");
                     holder.tvNameInstructor.setText(instructor.getName());
                     Glide.with(holder.itemView.getContext())
                             .load(instructor.getImage())

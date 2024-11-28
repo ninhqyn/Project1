@@ -37,6 +37,7 @@ import com.example.courseproject.Activity.ChangePasswordActivity;
 import com.example.courseproject.Activity.EditProfileActivity;
 import com.example.courseproject.Activity.LoginActivity;
 import com.example.courseproject.Activity.PrivacyActivity;
+import com.example.courseproject.Activity.QuizActivity;
 import com.example.courseproject.Api.ApiClient;
 import com.example.courseproject.Model.UpLoadRequestModel;
 import com.example.courseproject.Model.UserUpdateRequest;
@@ -118,9 +119,8 @@ public class AccountFragment extends Fragment {
         btnLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DataLocalManager.setUserLoggedIn(false);
-                Intent intent = new Intent(getActivity(), LoginActivity.class);
-                startActivity(intent);
+                dialogConfirm();
+
             }
         });
         // Inflate the layout for this fragment
@@ -170,6 +170,49 @@ public class AccountFragment extends Fragment {
         tvPhone.setText(DataLocalManager.getPhoneNumber());
         tvAddress.setText(DataLocalManager.getLocation());
     }
+    private void dialogConfirm() {
+        final Dialog dialog = new Dialog(getContext());
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_confirm_logout);
+        Window window = dialog.getWindow();
+
+        if (window != null) {
+            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
+            WindowManager.LayoutParams lp = window.getAttributes();
+            lp.dimAmount = 0.5f;
+            window.setAttributes(lp);
+            window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+            window.setBackgroundDrawableResource(R.drawable.background_loading);
+        }
+        dialog.setCancelable(false);
+
+        TextView tvConfirm,tvCancel;
+        tvConfirm = dialog.findViewById(R.id.tv_submit);
+        tvCancel = dialog.findViewById(R.id.tv_cancel);
+        tvCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();;
+            }
+        });
+        tvConfirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DataLocalManager.setUserLoggedIn(false);
+                DataLocalManager.setEmail("");
+                DataLocalManager.setUserName("");
+                DataLocalManager.setToken("");
+                DataLocalManager.setPhoneNumber("");
+                DataLocalManager.setLocation("");
+                Intent intent = new Intent(getActivity(), LoginActivity.class);
+                startActivity(intent);
+                getActivity().finish();
+
+            }
+        });
+        dialog.show();
+    }
+
 
 
 

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
@@ -77,6 +78,7 @@ public class ForgotCodeActivity extends AppCompatActivity {
                             intent.putExtra(KEY_EMAIL,getIntent().getStringExtra(KEY_EMAIL));
                             intent.putExtra(KEY_CODE,verificationCode);
                             startActivity(intent);
+                            finish();
                         } else {
                             // Handle verification failure
                             Toast.makeText(ForgotCodeActivity.this,"Sai mã .Xác thực thất bại",Toast.LENGTH_SHORT).show();
@@ -173,6 +175,11 @@ public class ForgotCodeActivity extends AppCompatActivity {
     private void setupTextWatchers() {
         EditText[] editTexts = {tvCode1, tvCode2, tvCode3, tvCode4, tvCode5, tvCode6};
 
+        // Đặt InputFilter để chỉ cho phép nhập 1 ký tự
+        for (EditText editText : editTexts) {
+            editText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(1)});
+        }
+
         for (int i = 0; i < editTexts.length; i++) {
             final int index = i;
             editTexts[i].addTextChangedListener(new TextWatcher() {
@@ -181,10 +188,26 @@ public class ForgotCodeActivity extends AppCompatActivity {
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    // Nếu người dùng nhập ký tự và ô không phải cuối cùng, di chuyển focus tới ô tiếp theo
                     if (s.length() == 1 && index < editTexts.length - 1) {
                         editTexts[index + 1].requestFocus();
                     }
-                    updateButtonState();
+
+                    // Nếu người dùng xóa ký tự và ô không phải đầu tiên, di chuyển focus về ô trước đó
+                    // Trường hợp đặc biệt: Nếu đang ở ô kế tiếp mà ô đó chưa nhập ký tự, focus chuyển về ô trước đó
+                    if (s.length() == 0) {
+                        if (index > 0) {
+                            // Nếu ô trước đã có ký tự, cho phép xóa ở ô đó
+                            if (editTexts[index - 1].getText().length() > 0) {
+                                editTexts[index - 1].requestFocus();
+                            } else {
+                                // Nếu ô trước cũng trống, giữ focus lại ô hiện tại
+                                editTexts[index].requestFocus();
+                            }
+                        }
+                    }
+
+                    updateButtonState(); // Cập nhật trạng thái của nút nếu cần
                 }
 
                 @Override
@@ -192,6 +215,9 @@ public class ForgotCodeActivity extends AppCompatActivity {
             });
         }
     }
+
+
+
 
     private void updateButtonState() {
         boolean allFilled = !tvCode1.getText().toString().isEmpty() &&

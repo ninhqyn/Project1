@@ -1,11 +1,14 @@
 package com.example.courseproject.Activity;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Patterns;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -32,6 +35,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     Button btn_send;
     String EMAIL;
     TextView tvError;
+    private Dialog loadingDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,8 +75,30 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         btn_back.setOnClickListener(v -> finish());
         btn_send.setOnClickListener(v -> {
             EMAIL = edit_email.getText().toString();
+            createDialogLoading();
             CallApiForgotPassword();
         });
+    }
+    private void createDialogLoading() {
+        loadingDialog = new Dialog(ForgotPasswordActivity.this);
+        loadingDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        loadingDialog.setContentView(R.layout.dialog_loading);
+        Window window = loadingDialog.getWindow();
+        if (window != null) {
+            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
+            WindowManager.LayoutParams lp = window.getAttributes();
+            lp.dimAmount = 0.5f;
+            window.setAttributes(lp);
+            window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+            window.setBackgroundDrawableResource(R.drawable.background_loading);
+        }
+        loadingDialog.setCancelable(false);
+        loadingDialog.show();
+    }
+    private void dismissLoadingDialog() {
+        if (loadingDialog != null && loadingDialog.isShowing()) {
+            loadingDialog.dismiss();
+        }
     }
 
     private void CallApiForgotPassword() {
@@ -81,10 +107,12 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         call.enqueue(new Callback<Unit>() {
             @Override
             public void onResponse(Call<Unit> call, Response<Unit> response) {
+                dismissLoadingDialog();
                 if (response.isSuccessful()) {
                     Intent intent = new Intent(ForgotPasswordActivity.this, ForgotCodeActivity.class);
                     intent.putExtra("email", EMAIL);
                     startActivity(intent);
+                    finish();
                 } else {
                     tvError.setText("Không tồn tại tài khoản nào như vậy!!");
                     tvError.setVisibility(TextView.VISIBLE);

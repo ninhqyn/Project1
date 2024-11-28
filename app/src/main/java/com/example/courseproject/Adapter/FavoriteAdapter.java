@@ -100,37 +100,41 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.NewCou
 
         // Tạo Calendar từ Date
         Calendar setDate = Calendar.getInstance();
-        setDate.setTime(date);
+        if(date!=null){
+            setDate.setTime(date);
+            // Lấy ngày hiện tại
+            Calendar currentDate = Calendar.getInstance();
 
-        // Lấy ngày hiện tại
-        Calendar currentDate = Calendar.getInstance();
+            // Tính khoảng cách
+            long differenceMillis = currentDate.getTimeInMillis() - setDate.getTimeInMillis();
+            long differenceSeconds = differenceMillis / 1000;
+            long differenceMinutes = differenceSeconds / 60;
+            long differenceHours = differenceMinutes / 60;
+            long differenceDays = differenceHours / 24;
+            long differenceMonths = differenceDays / 30;
+            long differenceYears = differenceMonths / 12;
 
-        // Tính khoảng cách
-        long differenceMillis = currentDate.getTimeInMillis() - setDate.getTimeInMillis();
-        long differenceSeconds = differenceMillis / 1000;
-        long differenceMinutes = differenceSeconds / 60;
-        long differenceHours = differenceMinutes / 60;
-        long differenceDays = differenceHours / 24;
-        long differenceMonths = differenceDays / 30;
-        long differenceYears = differenceMonths / 12;
+            String displayText;
 
-        String displayText;
+            if (differenceYears > 0) {
+                displayText = String.format("%d năm", differenceYears);
+            } else if (differenceMonths > 0) {
+                displayText = String.format("%d tháng", differenceMonths);
+            } else if (differenceDays > 0) {
+                displayText = String.format("%d ngày", differenceDays);
+            } else if (differenceHours > 0) {
+                displayText = String.format("%d giờ", differenceHours);
+            } else if (differenceMinutes > 0) {
+                displayText = String.format("%d phút", differenceMinutes);
+            } else {
+                displayText = "Vừa mới";
+            }
 
-        if (differenceYears > 0) {
-            displayText = String.format("%d năm", differenceYears);
-        } else if (differenceMonths > 0) {
-            displayText = String.format("%d tháng", differenceMonths);
-        } else if (differenceDays > 0) {
-            displayText = String.format("%d ngày", differenceDays);
-        } else if (differenceHours > 0) {
-            displayText = String.format("%d giờ", differenceHours);
-        } else if (differenceMinutes > 0) {
-            displayText = String.format("%d phút", differenceMinutes);
-        } else {
-            displayText = "Vừa mới";
+            holder.tvTime.setText(displayText);
         }
 
-        holder.tvTime.setText(displayText);
+
+
 
         holder.imgCourse.setOnClickListener(new View.OnClickListener() {
             @Override
